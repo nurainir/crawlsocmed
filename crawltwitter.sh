@@ -12,12 +12,34 @@ then
 	if [[ "$status" =~ "200" ]]
 	then
 		now=$(date +"%d-%m-%y-%H-%M")
-		grep '<p class="TweetTextSize TweetTextSize--[0-9][0-9]px js-tweet-text tweet-text"' temp | sed -n '/^$/!{s/<[^>]*>//g;p;}'  > feed
+		grep -E "(TweetTextSize)|(js-retweet-text)" temp | sed -n '/^$/!{s/<[^>]*>//g;p;}' | tr '[:upper:]' '[:lower:]' > feed
 		grep -oh "[0-9][0-9]\.[0-9][0-9] - [0-9][0-9]* [A-Z][a-z][a-z] [0-9][0-9][0-9][0-9]" temp  | uniq| sed '1d' > tgl
-		paste tgl feed | tr '[:upper:]' '[:lower:]' > "res/$nama-$now-t.tsv"
+		rt=false
+		> temp
+		while 
+		read line
+		do
+		if [[ "$line" =~ "retweet" ]]
+		then
+		rt=true	
+		continue	
+		fi
+		if [ "$rt" = true ]
+		then
+		echo " rt $line"
+		echo " rt $line" >> temp	
+		rt=false
+		else
+		echo "$line"
+		echo "$line" >> temp
+		fi	
+		
+		
+		done < feed
+		paste tgl temp  > "res/$nama-$now-t.tsv"
 		rm tgl feed temp
 	fi
 fi 
 done < $1 
 
-
+# <span class="js-retweet-text"
