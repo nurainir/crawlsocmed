@@ -12,12 +12,11 @@ then
 	if [[ "$status" =~ "200" ]]
 	then
 		now=$(date +"%d-%m-%y-%H-%M")
-		grep '<p class="TweetTextSize TweetTextSize--[0-9][0-9]px js-tweet-text tweet-text"' temp | sed -n '/^$/!{s/<[^>]*>//g;p;}'  > feed
-		grep -oh "[0-9][0-9]\.[0-9][0-9] - [0-9][0-9]* [A-Z][a-z][a-z] [0-9][0-9][0-9][0-9]" temp  | uniq| sed '1d' > tgl
-		paste tgl feed | tr '[:upper:]' '[:lower:]' > "res/$nama-$now-t.tsv"
-		rm tgl feed temp
+		 grep "yt-lockup-title" temp | grep -Eoh 'title=".*"  a'| sed -r 's/^.{7}//' | sed -r 's/.{4}$//' > feed
+		 grep "yt-lockup-meta-info" temp | grep -Eoh "</li><li>.*</li></ul>" | sed -r 's/^.{9}//' | sed -r 's/.{10}$//' > tgl
+		paste tgl feed | tr '[:upper:]' '[:lower:]'> res/$nama-$now-y.tsv
 	fi
 fi 
 done < $1 
-
+	
 
